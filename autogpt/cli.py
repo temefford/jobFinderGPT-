@@ -138,21 +138,23 @@ def main(
             # Initialize memory and make sure it is empty.
             # this is particularly important for indexing and referencing pinecone memory
             memory = get_memory(cfg, init=True)
-            # logger.typewriter_log(
-            #     "Using memory of type:", Fore.GREEN, f"{memory.__class__.__name__}"
-            # )
-            # logger.typewriter_log("Using Browser:", Fore.GREEN, cfg.selenium_web_browser)
-            config = AIConfig.load(cfg.ai_settings_file)
-            agent = Agent(
-                ai_name=config.ai_name,
-                memory=memory,
-                full_message_history=full_message_history,
-                next_action_count=next_action_count,
-                system_prompt=system_prompt,
-                triggering_prompt=triggering_prompt,
-            )
-            agent.upload_cv()
-            #agent.start_interaction_loop()                                                                                               
+            if memory:
+                # logger.typewriter_log(
+                #     "Using memory of type:", Fore.GREEN, f"{memory.__class__.__name__}"
+                # )
+                # logger.typewriter_log("Using Browser:", Fore.GREEN, cfg.selenium_web_browser)
+                config = AIConfig.load(cfg.ai_settings_file)
+                if config:
+                    agent = Agent(
+                        ai_name=config.ai_name,
+                        memory=memory,
+                        full_message_history=full_message_history,
+                        next_action_count=next_action_count,
+                        system_prompt=system_prompt,
+                        triggering_prompt=triggering_prompt,
+                    )
+                    if agent:
+                        agent.start_interaction_loop()                                                                                               
 
 
 if __name__ == "__main__":

@@ -9,7 +9,6 @@ from autogpt.logs import logger, print_assistant_thoughts
 from autogpt.speech import say_text
 from autogpt.spinner import Spinner
 from autogpt.utils import clean_input
-from autogpt.pages.upload_resume import main
 import streamlit as st
 import time
 from streamlit_chat import message
@@ -53,10 +52,6 @@ class Agent:
         self.system_prompt = system_prompt
         self.triggering_prompt = triggering_prompt
         
-
-    def upload_cv(self):
-       with st.container():
-           main()
             
     def start_interaction_loop(self):
     
@@ -68,14 +63,9 @@ class Agent:
         user_input = ""
         #message("Start Agent?")
         st.subheader("Now entering into work mode... Results will be posted below:")
-        st.write("____________________________________________________________")
+        st.markdown("---")
         i_1=0
-        #start_button_0 = st.button("Yessir")
-        #if start_button_0:
-        #self.enter_loop(cfg, loop_count, command_name, arguments, user_input, i_1)
         while True:       
-    #def enter_loop(self, cfg, loop_count, command_name, arguments, user_input, i_1):
-        # Discontinue if continuous limit is reached
             loop_count += 1
             if (
                 cfg.continuous_mode
@@ -86,7 +76,6 @@ class Agent:
                     "Continuous Limit Reached: ", Fore.YELLOW, f"{cfg.continuous_limit}"
                 )
                 break
-
             # Send message to AI, get response
             with st.spinner(
                     "Analyzing your goals and forming a plan... `{}` ".format("Thinking very very hard")
@@ -127,10 +116,9 @@ class Agent:
                 message(
                     f"{i_1}: Type yes to authorise command \n"
                     "Exit to exit program \n or enter feedback for me"
-                )
+                    )
                 #while True:
                 i_1+=1
-                
                 # col1, col2 = st.columns(2)
                 with st.spinner(
                     "Make a choice... I don't have all day `{}` ".format("annddd thennnn....")
@@ -179,8 +167,7 @@ class Agent:
                                 f"Assistant Reply: {assistant_reply} "
                                 f"\nResult: {result} "
                                 f"\nHuman Feedback: {user_input} "
-                            )
-                            
+                            )   
                         else:  
                             user_input = console_input
                             command_name = "human_feedback"
@@ -208,21 +195,9 @@ class Agent:
                                 logger.typewriter_log(
                                     "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
                                 )
-                            #self.enter_loop(cfg, loop_count, command_name, arguments, user_input, i_1)
+                            
                         
-                countdown = st.empty()
-                x=1
-                for i in range(1000):
-                    #countdown.markdown(f'### {1000-i}')
-                    time.sleep(1) 
-                    x+=1
-                if x > 990:
-                    break
-                   
-                    # with col2:        
-                    #     exit_button = st.button(f"EXIT", key=f"{i_1}_{i_1}_{i_1}")
-                #     if exit_button:
-                        
+            
                     
 
 
