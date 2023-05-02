@@ -1,0 +1,115 @@
+import streamlit as streamlit
+import pandas as pd
+import io
+import PyPDF2
+from PyPDF2 import PdfReader
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.pipeline import Pipeline
+import streamlit as st
+
+
+st.title("Resume Portal")
+st.subheader("Let's get that bad boy polished.")
+st.markdown("\n --- \n")
+# Main Description
+#st.markdown("Developed by Theo Mefford: https://github.com/temefford")
+#st.markdown("The app is still under development. Please reach me in the github repo if you have any comments or suggestions.")
+
+
+
+def extract_text_from_pdfs(pdf_files):
+    df = pd.DataFrame(columns=["file", "text"])
+    for pdf_file in pdf_files:
+        # Open the PDF file
+        with io.BytesIO(pdf_file.read()) as f:
+            pdf_reader = PyPDF2.PdfReader(f)
+            num_pages = len(pdf_reader.pages)
+            text = ""
+            # Iterate over all the pages
+            for page_num in range(num_pages):
+                page = pdf_reader.pages[page_num]
+                page_text = page.extract_text()
+                text += page_text
+            # Add the file name and the text to the data frame
+            df = df.append({"file": pdf_file.name, "text": text}, ignore_index=True)
+    return df
+
+def preprocess_text(text_list):
+    processed_text = []
+    for text in text_list:
+        num_words = len(text.split(" "))
+        if num_words > 10:  
+            processed_text.append(text)
+    return processed_text
+
+def remove_short_sentences(df):
+    df["sentences"] = df["sentences"].apply(preprocess_text)
+    return df
+
+def get_relevant_texts(df, topic):
+    model_embedding = SentenceTransformer("all-MiniLM-L6-v2")
+    model_embedding.save("all-MiniLM-L6-v2")
+    cosine_threshold = 0.3  # set threshold for cosine similarity value
+    queries = topic  # search query
+    results = []
+    for i, document in enumerate(df["sentences"]):
+        sentence_embeddings = model_embedding.encode(document)
+        query_embedding = model_embedding.encode(queries)
+        for j, sentence_embedding in enumerate(sentence_embeddings):
+            distance = cosine_similarity(
+                sentence_embedding.reshape((1, -1)), query_embedding.reshape((1, -1))
+            )[0][0]
+            sentence = df["sentences"].iloc[i][j]
+            results += [(i, sentence, distance)]
+    results = sorted(results, key=lambda x: x[2], reverse=True)
+    del model_embedding
+		
+    texts = []
+    for idx, sentence, distance in results:
+        if distance > cosine_threshold:
+            texts.append(sentence)
+    # turn the list to string
+    context = "".join(texts)
+    return context
+
+def get_pipeline():
+    modelname = "deepset/bert-base-cased-squad2"
+    model_qa = BertForQuestionAnswering.from_pretrained(modelname)
+    tokenizer = AutoTokenizer.from_pretrained("tokenizer-deepset")
+    qa = pipeline("question-answering", model=model_qa, tokenizer=tokenizer)
+    return qa
+
+def answer_question(pipeline, question: str, context: str) -> Dict:
+    input = {"question": question, "context": context}
+    return pipeline(input)
+
+def main():
+    
+    with st.spinner("Loading model. Please hold..."):
+        pipeline = get_pipeline()
+    return pipeline
+
+    pdf_files = st.file_uploader("Upload pdf files", type=["pdf"],
+                                accept_multiple_files=True)
+    if pdf_files: 
+    with st.spinner("processing pdf…"): 
+        df = extract_text_from_pdfs(pdf_files)
+        
+    topic = st.text_input("Enter the topic you want to ask here ") 
+    question = st.text_input("Enter your questions here 💭 ")
+    
+    pdf_files = st.file_uploader(
+    "Upload pdf files", type=["pdf"], accept_multiple_files=True
+)
+    if pdf_files:
+        with st.spinner("processing pdf..."):
+            df = extract_text_from_pdfs(pdf_files)
+        topic = st.text_input("Enter the topic you want to ask here")
+        question = st.text_input("Enter your questions here...")
+        if question != "":
+            with st.spinner("Searching. Please hold..."):
+                context = create_context(df)
+                qa_pipeline = start_app()
+                answer = answer_question(qa_pipeline, question, context)
+                st.write(answer)
