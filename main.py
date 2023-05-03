@@ -22,7 +22,7 @@ st.markdown("### 👋 Welcome to jobFinderGPT, your best tool to help you get yo
 #st.markdown("The app is still under development. Please reach me in the github repo if you have any comments or suggestions.")
 
 # Set up the sidebar
-st.sidebar.markdown(
+st.markdown(
     """
     ### Steps:
     1. Upload PDF File
@@ -35,20 +35,57 @@ st.sidebar.markdown(
 )
 
 # Allow the user to enter an OpenAI API key
-api = st.sidebar.text_input(
+open_api = st.sidebar.text_input(
     "**Enter OpenAI API Key**",
     type="password",
     placeholder="sk-",
     help="https://platform.openai.com/account/api-keys",
-)
-if api:
-    cfg.set_openai_api_key(api)
+)  
+if open_api:
+    cfg.set_openai_api_key(open_api)
+    st.sidebar.write("**OpenAPI stored**")
     
-# if 'generated' not in st.session_state:
-#     st.session_state['generated'] = []
+# serp_api = st.sidebar.text_input(
+#     "**Enter SERP API Key**",
+#     type="password",
+#     placeholder="sk-",
+#     help="https://platform.openai.com/account/api-keys",
+# )  
+# if serp_api:
+#     cfg.set_serp_api_key(serp_api)
+#     st.write("SERPAPI stored")
 
-# if 'past' not in st.session_state:
-#     st.session_state['past'] = []
+google_api = st.sidebar.text_input(
+    "**Enter Google API Key**",
+    type="password",
+    placeholder="",
+    help="https://platform.openai.com/account/api-keys",
+)  
+if google_api:
+    cfg.set_google_api_key(google_api)
+    st.sidebar.write("Google API stored")
+    
+pinecone_api = st.sidebar.text_input(
+    "**Enter Pinecone API Key**",
+    type="password",
+    placeholder="",
+    help="https://platform.openai.com/account/api-keys",
+)  
+if pinecone_api:
+    cfg.set_pinecone_api_key(pinecone_api)
+    st.sidebar.write("Pinecone API stored")
+    
+pinecone_region = st.sidebar.text_input(
+    "**Enter Pinecone Region**",
+    type="password",
+    placeholder="",
+    help="https://platform.openai.com/account/api-keys",
+)  
+if pinecone_region:
+    cfg.set_pinecone_region(pinecone_region)
+    st.sidebar.write("Pinecone Region stored")
+    
+
    
 st.sidebar.markdown("---")
 st.markdown("---")

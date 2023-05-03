@@ -165,7 +165,7 @@ def get_prompt() -> str:
     return prompt_generator.generate_prompt_string()
 
 
-def construct_prompt() -> str:
+def construct_prompt(ai_name, ai_role, ai_goals) -> str:
     """Construct the prompt for the AI to respond to
 
     Returns:
@@ -199,7 +199,7 @@ def construct_prompt() -> str:
     #     with col2:
     #         no_button = st.button("no")
     #     if no_button:
-    config = prompt_user()
+    config = AIConfig(ai_name, ai_role, ai_goals)
     if config:
         config.save(CFG.ai_settings_file)
         ai_name = config.ai_name

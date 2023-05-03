@@ -5,8 +5,8 @@ from autogpt.config import config
 
 # Setting page title and header
 st.set_page_config(page_title="Cover Letter Generator", page_icon=":robot_face:")
-st.title("Cover Letter Generator")
-st.markdown("I'm here to do the repetetive tasks so that you can focus on more interesting things ;)")
+st.title("ChatGPT Interface")
+st.markdown("In case you want to use chatGPT without opening another tab.")
             
 cfg=config.Config()
 # Set org ID and API key
@@ -60,7 +60,7 @@ if clear_button:
 
 # generate a response
 def generate_response(prompt):
-    st.session_state['messages'].append({"role": "user", "content": generate_prompt(prompt)})
+    st.session_state['messages'].append({"role": "user", "content": prompt})
 
     completion = openai.ChatCompletion.create(
         model=model,

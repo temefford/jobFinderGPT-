@@ -12,6 +12,7 @@ from autogpt.utils import clean_input
 import streamlit as st
 import time
 from streamlit_chat import message
+from datetime import datetime
 
 
 class Agent:
@@ -114,21 +115,22 @@ class Agent:
                     f"log-{i_1}"
                 )
                 message(
-                    f"{i_1}: Type yes to authorise command \n"
-                    "Exit to exit program \n or enter feedback for me"
+                    f"{i_1}: Type 'yes' to authorise command \n"
+                    "'Exit' to exit program \n or enter your own feedback for me execute"
                     )
                 #while True:
                 i_1+=1
-                # col1, col2 = st.columns(2)
-                with st.spinner(
-                    "Make a choice... I don't have all day `{}` ".format("annddd thennnn....")
-                    ): 
-                    console_input = st.text_input(
-                        f"**{loop_count} : Would would you like me to do?**",
-                        placeholder="Feedback",
-                        key=f"{i_1}"
-                    )
-                    if console_input:
+                with st.form(key=str(datetime.now()), clear_on_submit=True):
+                    with st.spinner(
+                        "Make a choice... I don't have all day `{}` ".format("annddd thennnn....")
+                        ): 
+                        console_input = st.text_input(
+                            f"**Would would you like me to do?**",
+                            value="yes",
+                            key=f"{i_1}"
+                        )
+                        submit_button = st.form_submit_button(label='Send')
+                    if submit_button and console_input:
                         if console_input.lower().strip() == "yes":
                             user_input = "GENERATE NEXT COMMAND JSON"
                             st.write(
@@ -158,7 +160,7 @@ class Agent:
                                 logger.typewriter_log(
                                     "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
                                 )
-                            #self.enter_loop(cfg, loop_count, command_name, arguments, user_input, i_1)
+                            pass
                             
                         elif console_input.lower() == "exit":
                             user_input = "EXIT"
@@ -168,6 +170,8 @@ class Agent:
                                 f"\nResult: {result} "
                                 f"\nHuman Feedback: {user_input} "
                             )   
+                            break
+                        
                         else:  
                             user_input = console_input
                             command_name = "human_feedback"
@@ -195,7 +199,10 @@ class Agent:
                                 logger.typewriter_log(
                                     "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
                                 )
-                            
+                            pass
+            if i_1==3:
+                time.sleep(1000)
+                                
                         
             
                     
