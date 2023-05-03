@@ -2,12 +2,16 @@
 from colorama import Fore, Style
 from autogpt import utils
 from autogpt.config.ai_config import AIConfig
+from autogpt.config.config import Config
 from autogpt.logs import logger
 from utils.upload_resume import main, userPortfolio
 import streamlit as st
 from streamlit_chat import message
 import time
       
+cfg = Config()
+openai_api = cfg.openai_api_key
+google_api = cfg.google_api_key
 
 # --- Initialising SessionState ---
 if "ai_name" not in st.session_state:
@@ -60,7 +64,7 @@ def get_goals():
             #autocomplete= "an AI designed to help me clean up my portfolio, write cover letters, and search put forward great applications."
             )    
         goals_button = st.form_submit_button(f"**Confirm agents's Goals**")
-    if (goals_button and ai_goals) or st.session_state.ai_goals:
+    if goals_button and ai_goals and st.session_state.ai_goals:
         return ai_goals
 
 def prompt_user() -> AIConfig:

@@ -14,6 +14,9 @@ import time
 from streamlit_chat import message
 from datetime import datetime
 
+cfg = Config()
+openai_api = cfg.openai_api_key
+google_api = cfg.google_api_key
 
 class Agent:
     """Agent class for interacting with Auto-GPT.
@@ -66,6 +69,11 @@ class Agent:
         st.subheader("Now entering into work mode... Results will be posted below:")
         st.markdown("---")
         i_1=0
+        key_button = st.button("keys?")
+        if key_button and not openai_api:
+            message("definitely haven't put in your openai api key... ")
+        if key_button and not google_api:
+            message("definitely haven't put in your google api key... ")
         while True:       
             loop_count += 1
             if (

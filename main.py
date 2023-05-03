@@ -27,8 +27,9 @@ st.markdown(
     ### Steps:
     1. Upload PDF File
     2. Enter Your Secret Key to connect to OpenAI
-    3. Strategize and get feedback from your personal jobBot
-    4. Deploy your bot in a variety of ways to help you land your next job!
+    3. Enter Your other API keys for access to agents with internet search capability and persistant storage.
+    4. Strategize and get feedback from your personal jobBot
+    5. Deploy your bot in a variety of ways to help you land your next job!
 
     """
     "___"

@@ -9,10 +9,21 @@ from openai.error import APIError, RateLimitError
 
 from autogpt.config import Config
 from autogpt.logs import logger
+import streamlit as st
 
 CFG = Config()
-
+if not openai.api_key:
+    open_api = st.text_input(
+        "**I need you OpenAI API key!!!**",
+        type="password",
+        placeholder="sk-",
+        help="https://platform.openai.com/account/api-keys",
+         )  
+    if open_api:
+        CFG.set_openai_api_key(open_api)
+        st.write("**OpenAPI stored**")
 openai.api_key = CFG.openai_api_key
+
 
 
 def call_ai_function(

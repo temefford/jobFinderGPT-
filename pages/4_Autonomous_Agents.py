@@ -108,27 +108,8 @@ if res_upload:
 
 st.subheader("Time to meet your new assistant")
 st.write("---")
-    #     
-   
-    #         with st.spinner(
-    #                     "Thinnnkinng"
-    #                 ):
-    #             time.sleep(1) 
-    #             # Get AI Role from User
-    #             
-    #             with st.spinner(
-    #                             "Thinnnkinng"
-    #                         ):
-    #                     time.sleep(2) 
-    #             message(
-    #                 "For example, 'an AI designed to help me clean up my portfolio, write cover letters, and search put forward great applications.'",
-    #                 )
-    #             with st.spinner(
-    #                     "Your turn:"
-    #                 ):
-    #                 time.sleep(3) 
-    #             message("...", "you")
-def main():  
+    
+def main():
     agent_params = define_agent()
     if agent_params:
         message("yayyyy")
@@ -142,7 +123,7 @@ def main():
             # Make a constant:
             triggering_prompt = (
                 "Determine which next command to use, and respond using the"
-                " format specified above:"
+                " format specified above. If your responses are too similar to previous than this prompt should be registered as 'create a prompt to advance my progress toward giving good advice about job hunting.':"
             )
             # Initialize memory and make sure it is empty.
             # this is particularly important for indexing and referencing pinecone memory
