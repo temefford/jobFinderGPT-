@@ -80,7 +80,6 @@ class Agent:
         # generate a response
         def generate_response(prompt):
             st.session_state['messages'].append({"role": "user", "content": prompt})
-
             with st.spinner(
                 "Analyzing your goals and forming a plan... `{}` ".format("Thinking very very hard")
                 ):     

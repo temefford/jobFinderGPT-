@@ -28,11 +28,29 @@ import base64
 cfg = Config()
 openai_api = cfg.openai_api_key
 
+st.title("Resume Review")
+st.markdown("\n --- \n")
+# Main Description
+# Allow the user to enter an OpenAI API key
+open_api = st.sidebar.text_input(
+    "**Enter OpenAI API Key**",
+    type="password",
+    placeholder="sk-",
+    help="https://platform.openai.com/account/api-keys",
+)  
+if open_api:
+    cfg.set_openai_api_key(open_api)
+    st.sidebar.write("**OpenAPI stored**")
+    
+
 if 'generated_res' not in st.session_state:
     st.session_state['generated_res'] = []
-
 if 'past' not in st.session_state:
     st.session_state['past_res'] = []   
+if "user_input" not in st.session_state:
+    st.session_state['user_input'] = ""
+if "output" not in st.session_state:
+    st.session_state['output'] = ""
         
 # Define a function to parse a PDF file and extract its text content
 def show_pdf(file_path):
@@ -132,7 +150,7 @@ def main():
                     chain_type = "stuff",
                     retriever=index.as_retriever()
                 )
-                qa.run("What is this document about? What are the key points?")
+                #qa.run("What is this document about? What are the key points?")
                 llm = OpenAI(
                         temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
                     )
@@ -180,26 +198,30 @@ def main():
                         st.session_state.past_res.append(in_text)
                         st.session_state.generated_res.append(res)
                         st.info(res, icon="🤖")
-                resume_query = st.text_input(
-                    "**Insert Text Here**",
-                    placeholder="You can ask me more questions about your work history here",
-                    )
-                if resume_query:
-                    st.session_state.past_res.append(resume_query)
-                    with st.spinner(
-                        "Generating Answer to your Query : `{}` ".format(resume_query)
-                        ):
-                        res = agent_chain.run(resume_query)
-                        st.session_state.generated_res.append(res)
-                        st.info(res, icon="🤖")
-
+                container = st.container()
+                with container:
+                    with st.form(key='my_form', clear_on_submit=True):
+                        resume_query = st.text_input(
+                            "**Insert Text Here**",
+                            placeholder="You can ask me more questions about your work history here",
+                            )
+                        submit_button = st.form_submit_button(label='Send')
+                    if submit_button and resume_query:
+                        st.session_state['user_input'] = resume_query
+                        with st.spinner(
+                            "Generating Answer to your Query : `{}` ".format(resume_query)
+                            ):
+                            res = agent_chain.run(resume_query)
+                            st.session_state.generated_res.append(res)
+                            st.info(res, icon="🤖")
+                        st.session_state['past'].append(resume_query)
                         # Allow the user to view the conversation history and other information stored in the agent's memory
-                if st.session_state['generated_res']:
-                    st.write("Chat History")
-                    for i in range(len(st.session_state['generated_res'])-1, 0, -1):
-                        message(st.session_state["generated_res"][i], key=str(i))
-                        message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
-                                
+                        if st.session_state['generated_res']:
+                            st.write("Chat History")
+                            for i in range(len(st.session_state['generated_res'])-1, 0, -1):
+                                message(st.session_state["generated_res"][i], key=str(i))
+                                message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
+                                        
 
                     # Allow the user to view the conversation history and other information stored in the agent's memory
                     with st.expander("History/Memory"):
