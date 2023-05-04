@@ -72,74 +72,26 @@ def main():
             if submit_button and role_input and loc_input:
                 message("Let the search begin..")
                 with st.spinner("uploading..."):
-                    st.success("Job posts retrieved", icon="✅")
-                url = "https://linkedin-jobs-search.p.rapidapi.com/"
-                payload = {
-                    "search_terms": "{role_input}",
-                    "location": "{loc_input}",
-                    "page": "1"
-                }
-                headers = {
-                    "content-type": "application/json",
-                    "X-RapidAPI-Key": "4d611edcf8msh6a0f767fb85934dp11207ejsnf5ff312b59ce",
-                    "X-RapidAPI-Host": "linkedin-jobs-search.p.rapidapi.com"
-                }
-                # Opening JSON file
-                #response = open('docs/example_job_post.json')
-                
-                # returns JSON object as 
-                # a dictionary
-                response = requests.post(url, json=payload, headers=headers)
-                json_res = response.json()
-                st.session_state.job_search_results.append(json_res)
-                st.subheader("Job Postings:")
-                with st.expander("Show Page Content", expanded=False):
-                    st.write(json_res)
-                st.subheader("Top 5 Best Matched Job Postings:")
-                ranked_jobs = return_jobs(resume[0], json_res)
-                st.dataframe(ranked_jobs)
-                #for i in range(len(ranked_jobs)):
-                #    st.write(f"{i+1} : {ranked_jobs[i]}")
-                
-                
-    #             st.session_state['past'].append(user_input)
-    #             st.session_state['generated'].append(output)
-    #             st.session_state['model_name'].append(model_name)
-    #             st.session_state['total_tokens'].append(total_tokens)
-
-    #         # from https://openai.com/pricing#language-models
-    #         if model_name == "GPT-3.5":
-    #             cost = total_tokens * 0.002 / 1000
-    #         else:
-    #             cost = (prompt_tokens * 0.03 + completion_tokens * 0.06) / 1000
-
-    #         st.session_state['cost'].append(cost)
-    #         st.session_state['total_cost'] += cost
-
-    # if st.session_state['generated']:
-    #     with response_container:
-    #         for i in range(len(st.session_state['generated'])):
-    #             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
-    #             message(st.session_state["generated"][i], key=str(i))
-    #             st.write(
-    #                 f"Model used: {st.session_state['model_name'][i]}; Number of tokens: {st.session_state['total_tokens'][i]}; Cost: ${st.session_state['cost'][i]:.5f}")
-    #             counter_placeholder.write(f"Total cost of this conversation: ${st.session_state['total_cost']:.5f}")
-    #     url = "https://linkedin-jobs-search.p.rapidapi.com/"
-
-    #     payload = {
-    #         "search_terms": "python programmer",
-    #         "location": "Chicago, IL",
-    #         "page": "1"
-    #     }
-    #     headers = {
-    #         "content-type": "application/json",
-    #         "X-RapidAPI-Key": "4d611edcf8msh6a0f767fb85934dp11207ejsnf5ff312b59ce",
-    #         "X-RapidAPI-Host": "linkedin-jobs-search.p.rapidapi.com"
-    #     }
-
-    #     response = requests.post(url, json=payload, headers=headers)
-
-    #     print(response.json())
+                    url = "https://linkedin-jobs-search.p.rapidapi.com/"
+                    payload = {
+                        "search_terms": "{role_input}",
+                        "location": "{loc_input}",
+                        "page": "1"
+                    }
+                    headers = {
+                        "content-type": "application/json",
+                        "X-RapidAPI-Key": "4d611edcf8msh6a0f767fb85934dp11207ejsnf5ff312b59ce",
+                        "X-RapidAPI-Host": "linkedin-jobs-search.p.rapidapi.com"
+                    }
+                    response = requests.post(url, json=payload, headers=headers)
+                    json_res = response.json()
+                    st.session_state.job_search_results.append(json_res)
+                    st.subheader("Job Postings:")
+                    with st.expander("Show Page Content", expanded=False):
+                        st.write(json_res)
+                    st.subheader("Top 5 Best Matched Job Postings:")
+                    ranked_jobs = return_jobs(resume[0], json_res)
+                    st.dataframe(ranked_jobs)
     
 if __name__ == "__main__":
     main()
