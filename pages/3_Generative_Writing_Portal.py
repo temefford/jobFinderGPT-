@@ -15,7 +15,7 @@ cfg=config.Config()
 #     page_icon="",
 #     layout="centered")
 st.title("Cold Email & Cover Letter Generator")
-st.markdown("#### I'm here to do the repetetive tasks so that you can focus on more interesting things ;)")
+st.markdown("#### I'm here to do the repetitive tasks so that you can focus on more interesting things ;)")
 #st.subheader("Generate Personalized Cover Letters and Cold Emails")
 st.markdown("---")
 # Main Description

@@ -29,7 +29,7 @@ cfg = Config()
 openai_api = cfg.openai_api_key
 google_api = cfg.google_api_key
 st.title("Your Personal Employment Agency")
-st.subheader("Set up and manage your team of AI bots to help you find a job. The 'job agents' that are recurively trained and attached to LLM's and the internet to do the tedious work for you.")
+st.subheader("Set up and manage your team of AI bots to help you find a job. The 'job agents' that are recursively trained as you interact with them and are attached to LLM's and the internet to do the tedious work for you.")
 st.markdown("\n --- \n")
 
 # Allow the user to enter an OpenAI API key
@@ -70,6 +70,8 @@ if 'total_tokens_team' not in st.session_state:
     st.session_state['total_tokens_team'] = []
 if 'total_cost_team' not in st.session_state:
     st.session_state['total_cost_team'] = 0.0
+if 'open_api' not in st.session_state:
+    st.session_state['open_api'] = None
 
 # Sidebar - let user choose model, show total cost of current conversation, and let user clear the current conversation
 st.sidebar.write("---")
