@@ -204,34 +204,35 @@ def main():
                             agent_chain = AgentExecutor.from_agent_and_tools(
                                 agent=agent, tools=tools, verbose=True, memory=st.session_state.memory
                                 )
-                            container = st.container()
-                            with container:
-                                with st.form(key='my_form', clear_on_submit=True):
-                                    resume_query = st.text_input(
-                                        "**Insert Text Here**",
-                                        placeholder="You can ask me more questions about your work history here",
-                                        )
-                                    submit_button = st.form_submit_button(label='Send')
-                                if submit_button and resume_query:
-                                    st.session_state['user_input'] = resume_query
-                                    with st.spinner(
-                                        "Generating Answer to your Query : `{}` ".format(resume_query)
-                                        ):
-                                        res = agent_chain.run(resume_query)
-                                        st.session_state.generated_res.append(res)
-                                        st.info(res, icon="🤖")
-                                    st.session_state['past'].append(resume_query)
-                                    # Allow the user to view the conversation history and other information stored in the agent's memory
-                                    if st.session_state['generated_res']:
-                                        st.write("Chat History")
-                                        for i in range(len(st.session_state['generated_res'])-1, 0, -1):
-                                            message(st.session_state["generated_res"][i], key=str(i))
-                                            message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
-                                                    
+                            while True:
+                                container = st.container()
+                                with container:
+                                    with st.form(key='my_form', clear_on_submit=True):
+                                        resume_query = st.text_input(
+                                            "**Insert Text Here**",
+                                            placeholder="You can ask me more questions about your work history here",
+                                            )
+                                        submit_button = st.form_submit_button(label='Send')
+                                    if submit_button and resume_query:
+                                        st.session_state['user_input'] = resume_query
+                                        with st.spinner(
+                                            "Generating Answer to your Query : `{}` ".format(resume_query)
+                                            ):
+                                            res = agent_chain.run(resume_query)
+                                            st.session_state.generated_res.append(res)
+                                            st.info(res, icon="🤖")
+                                        st.session_state['past'].append(resume_query)
+                                        # Allow the user to view the conversation history and other information stored in the agent's memory
+                                        if st.session_state['generated_res']:
+                                            st.write("Chat History")
+                                            for i in range(len(st.session_state['generated_res'])-1, 0, -1):
+                                                message(st.session_state["generated_res"][i], key=str(i))
+                                                message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
+                                                        
 
-                                # Allow the user to view the conversation history and other information stored in the agent's memory
-                                with st.expander("History/Memory"):
-                                    st.session_state.memory
+                                    # Allow the user to view the conversation history and other information stored in the agent's memory
+                                    with st.expander("History/Memory"):
+                                        st.session_state.memory
 
 if __name__ == "__main__":
     main()
