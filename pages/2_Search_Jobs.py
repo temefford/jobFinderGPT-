@@ -26,6 +26,10 @@ if 'resume' not in st.session_state:
     st.session_state['resume'] = None
 if 'open_api' not in st.session_state:
     st.session_state['open_api'] = None
+if 'role' not in st.session_state:
+    st.session_state['role'] = None
+if 'loc' not in st.session_state:
+    st.session_state['loc'] = None
     
 # Allow the user to enter an OpenAI API key
 open_api = st.sidebar.text_input(
@@ -56,7 +60,7 @@ def main():
         #st.session_state.resume != None:
         container = st.container()
         with container:
-            with st.form(key='job', clear_on_submit=True):
+            with st.form(key='job'):
                 col1, col2 = st.columns(2)
                 with col1:
                     role_input = st.text_area("What job role are you seeking?", value="Data Scientist", key='roleinput', height=30)

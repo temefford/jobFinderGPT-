@@ -50,8 +50,8 @@ def google_official_search(query: str, num_results: int = 8) -> str | list[str]:
 
     try:
         # Get the Google API key and Custom Search Engine ID from the config file
-        api_key = CFG.google_api_key
-        custom_search_engine_id = CFG.custom_search_engine_id
+        api_key = "550621787905-3344cq04d187vbh3qfcalsimhbi6av8m.apps.googleusercontent.com"
+        custom_search_engine_id = "c0fea6b6772614de3"
 
         # Initialize the Custom Search API service
         service = build("customsearch", "v1", developerKey=api_key)

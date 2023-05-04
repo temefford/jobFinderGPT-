@@ -8,8 +8,8 @@ from autogpt.memory.base import MemoryProviderSingleton
 
 class PineconeMemory(MemoryProviderSingleton):
     def __init__(self, cfg):
-        pinecone_api_key = cfg.pinecone_api_key
-        pinecone_region = cfg.pinecone_region
+        pinecone_api_key = "a55c44de-2d56-4dad-b615-049cf4f494d8"
+        pinecone_region = "asia-southeast1-gcp"
         pinecone.init(api_key=pinecone_api_key, environment=pinecone_region)
         dimension = 1536
         metric = "cosine"
