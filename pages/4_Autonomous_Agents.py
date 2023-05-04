@@ -72,6 +72,8 @@ if 'total_cost_team' not in st.session_state:
     st.session_state['total_cost_team'] = 0.0
 if 'open_api' not in st.session_state:
     st.session_state['open_api'] = None
+if 'memory' not in st.session_state:
+    st.session_state['memory'] = []
 
 # Sidebar - let user choose model, show total cost of current conversation, and let user clear the current conversation
 st.sidebar.write("---")
@@ -127,26 +129,35 @@ def main():
                 "Determine which next command to use, and respond using the"
                 " format specified above. If your responses are too similar to previous than this prompt should be registered as 'create a prompt to advance my progress toward giving good advice about job hunting.':"
             )
-            # Initialize memory and make sure it is empty.
-            # this is particularly important for indexing and referencing pinecone memory
-            memory = get_memory(cfg, init=True)
-            if memory:
-                # logger.typewriter_log(
-                #     "Using memory of type:", Fore.GREEN, f"{memory.__class__.__name__}"
-                # )
-                # logger.typewriter_log("Using Browser:", Fore.GREEN, cfg.selenium_web_browser)
-                config = AIConfig.load(cfg.ai_settings_file)
-                if config:
-                    agent = Agent(
-                        ai_name=config.ai_name,
-                        memory=memory,
-                        full_message_history=full_message_history,
-                        next_action_count=next_action_count,
-                        system_prompt=system_prompt,
-                        triggering_prompt=triggering_prompt,
-                    )
-                    if agent:
-                        agent.start_interaction_loop()  
+            openai_api = st.text_input(
+                "**Enter Your OpenAI API Key**",
+                type="password",
+                placeholder="sk-",
+                help="https://platform.openai.com/account/api-keys",
+            )  
+            if openai_api:
+                cfg.set_openai_api_key(openai_api)
+                st.write("**OpenAPI stored**")
+                # Initialize memory and make sure it is empty.
+                # this is particularly important for indexing and referencing pinecone memory
+                memory = get_memory(cfg, init=True)
+                if memory:
+                    # logger.typewriter_log(
+                    #     "Using memory of type:", Fore.GREEN, f"{memory.__class__.__name__}"
+                    # )
+                    # logger.typewriter_log("Using Browser:", Fore.GREEN, cfg.selenium_web_browser)
+                    config = AIConfig.load(cfg.ai_settings_file)
+                    if config:
+                        agent = Agent(
+                            ai_name=config.ai_name,
+                            memory=memory,
+                            full_message_history=full_message_history,
+                            next_action_count=next_action_count,
+                            system_prompt=system_prompt,
+                            triggering_prompt=triggering_prompt,
+                        )
+                        if agent:
+                            agent.start_interaction_loop()  
                         
 if __name__ == "__main__":
     main()

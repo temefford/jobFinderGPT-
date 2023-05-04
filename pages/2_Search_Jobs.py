@@ -66,7 +66,9 @@ def main():
                     #loc_button = st.form_submit_button(label='Confirm')
                 submit_button = st.form_submit_button(label='Submit')
             if submit_button and role_input and loc_input:
-                message("Let the search being...")
+                message("Let the search begin..")
+                with st.spinner("uploading..."):
+                    st.success("Job posts retrieved", icon="✅")
                 url = "https://linkedin-jobs-search.p.rapidapi.com/"
                 payload = {
                     "search_terms": "{role_input}",
