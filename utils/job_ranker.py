@@ -189,8 +189,8 @@ def return_jobs(string_data, json_list):
 
     final = Mdf.sort_values('score', ascending=False)
 
-    ret = []
-    for i in final.head(5)['job_url'].to_numpy():
-        ret.append(i)
+    ret_df = pd.DataFrame(columns=["job_title", "company_name", "posted_date", "job_url"])
+    for i, url in enumerate(final.head(5)['job_url'].to_numpy()):
+        ret_df = pd.concat([ret_df, df[df['job_url']==url][["job_title", "company_name", "posted_date", "job_url"]]])
 
-    return ret
+    return ret_df

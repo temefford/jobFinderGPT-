@@ -97,8 +97,9 @@ def main():
                     st.write(json_res)
                 st.subheader("Top 5 Best Matched Job Postings:")
                 ranked_jobs = return_jobs(resume[0], json_res)
-                for i in range(len(ranked_jobs)):
-                    st.write(f"{i+1} : {ranked_jobs[i]}")
+                st.dataframe(ranked_jobs)
+                #for i in range(len(ranked_jobs)):
+                #    st.write(f"{i+1} : {ranked_jobs[i]}")
                 
                 
     #             st.session_state['past'].append(user_input)
