@@ -151,87 +151,91 @@ def main():
                     cfg.set_openai_api_key(openai_api)
                     st.write("**OpenAPI stored**")
                     st.session_state.open_api = openai_api
-                    # Test the embeddings and save the index in a vector database
-                    index = test_embed()
-                    # Set up the question-answering system
-                    qa = RetrievalQA.from_chain_type(
-                        llm=OpenAI(openai_api_key=openai_api),
-                        chain_type = "stuff",
-                        retriever=index.as_retriever()
-                    )
-                    with st.spinner(
-                            "Analyzing your resume: `{}` ".format("Analyzing")
-                        ):
-                        out = qa.run("What is this document about? What are the key points? Why is it so amazing?")
-                        if out:
-                            message(out)
-                            llm = OpenAI(
-                                    temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
-                                )
-                            memory = ConversationBufferMemory(memory_key="chat_history")
-                            tools = [    
-                                Tool(
-                                    name="Document Query",
-                                    func=qa.run,
-                                    description="Useful when answering questions about document or answering questions related to the Curriculum Vitae.",
-                                )
-                            ]
-                            prefix = """Welcome to the Document QA retrieval feedback chatbot. A work history document will be submitted for review and questions. 
-                                    You have access to a single tool:"""
-                            suffix = """Begin!"
-                            {chat_history}
-                            Question: {input}
-                            {agent_scratchpad}"""
+                    anal = st.button(
+                        "**Analyze Resume?**"
+                        )   
+                    if anal:
+                        # Test the embeddings and save the index in a vector database
+                        index = test_embed()
+                        # Set up the question-answering system
+                        qa = RetrievalQA.from_chain_type(
+                            llm=OpenAI(openai_api_key=openai_api),
+                            chain_type = "stuff",
+                            retriever=index.as_retriever()
+                        )
+                        with st.spinner(
+                                "Analyzing your resume: `{}` ".format("Analyzing")
+                            ):
+                            out = qa.run("What is this document about? What are the key points? Why is it so amazing?")
+                            if out:
+                                message(out)
+                                llm = OpenAI(
+                                        temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
+                                    )
+                                memory = ConversationBufferMemory(memory_key="chat_history")
+                                tools = [    
+                                    Tool(
+                                        name="Document Query",
+                                        func=qa.run,
+                                        description="Useful when answering questions about document or answering questions related to the Curriculum Vitae.",
+                                    )
+                                ]
+                                prefix = """Welcome to the Document QA retrieval feedback chatbot. A work history document will be submitted for review and questions. 
+                                        You have access to a single tool:"""
+                                suffix = """Begin!"
+                                {chat_history}
+                                Question: {input}
+                                {agent_scratchpad}"""
 
-                            prompt = ZeroShotAgent.create_prompt(
-                                tools,
-                                prefix=prefix,
-                                suffix=suffix,
-                                input_variables=["input", "chat_history", "agent_scratchpad"],
-                                )
-                            if "memory" not in st.session_state:
-                                st.session_state.memory = ConversationBufferMemory(
-                                    memory_key="chat_history", return_messages=True
-                                )
+                                prompt = ZeroShotAgent.create_prompt(
+                                    tools,
+                                    prefix=prefix,
+                                    suffix=suffix,
+                                    input_variables=["input", "chat_history", "agent_scratchpad"],
+                                    )
+                                if "memory" not in st.session_state:
+                                    st.session_state.memory = ConversationBufferMemory(
+                                        memory_key="chat_history", return_messages=True
+                                    )
 
-                            llm_chain = LLMChain(
-                                llm=OpenAI(
-                                    temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
-                                ),
-                                prompt=prompt,
-                                )
-                            agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True, return_intermediate_steps=True)
-                            agent_chain = AgentExecutor.from_agent_and_tools(
-                                agent=agent, tools=tools, verbose=True, memory=memory
-                                )
-                            container = st.container()
-                            with container:
-                                with st.form(key='my_form', clear_on_submit=True):
-                                    resume_query = st.text_input(
-                                        "**Insert Text Here**",
-                                        placeholder="You can ask me more questions about your work history here",
-                                        )
-                                    submit_button = st.form_submit_button(label='Send')
-                                if submit_button and resume_query:
-                                    st.session_state['user_input'] = resume_query
-                                    with st.spinner(
-                                        "Generating Answer to your Query : `{}` ".format(resume_query)
-                                        ):
-                                        res = agent_chain.run(resume_query)
-                                        st.session_state.generated_res.append(res)
-                                        st.info(res, icon="🤖")
-                                    st.session_state['past'].append(resume_query)
+                                llm_chain = LLMChain(
+                                    llm=OpenAI(
+                                        temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
+                                    ),
+                                    prompt=prompt,
+                                    )
+                                agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True, return_intermediate_steps=True)
+                                agent_chain = AgentExecutor.from_agent_and_tools(
+                                    agent=agent, tools=tools, verbose=True, memory=st.session_state.memory
+                                    )
+                                container = st.container()
+                                with container:
+                                    with st.form(key='my_form', clear_on_submit=True):
+                                        resume_query = st.text_input(
+                                            "**Insert Text Here**",
+                                            placeholder="You can ask me more questions about your work history here",
+                                            )
+                                        submit_button = st.form_submit_button(label='Send')
+                                    if submit_button and resume_query:
+                                        st.session_state['user_input'] = resume_query
+                                        with st.spinner(
+                                            "Generating Answer to your Query : `{}` ".format(resume_query)
+                                            ):
+                                            res = agent_chain.run(resume_query)
+                                            st.session_state.generated_res.append(res)
+                                            st.info(res, icon="🤖")
+                                        st.session_state['past'].append(resume_query)
+                                        # Allow the user to view the conversation history and other information stored in the agent's memory
+                                        if st.session_state['generated_res']:
+                                            st.write("Chat History")
+                                            for i in range(len(st.session_state['generated_res'])-1, 0, -1):
+                                                message(st.session_state["generated_res"][i], key=str(i))
+                                                message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
+                                                        
+
                                     # Allow the user to view the conversation history and other information stored in the agent's memory
-                                    if st.session_state['generated_res']:
-                                        st.write("Chat History")
-                                        for i in range(len(st.session_state['generated_res'])-1, 0, -1):
-                                            message(st.session_state["generated_res"][i], key=str(i))
-                                            message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
-                                                    
-
-                                # Allow the user to view the conversation history and other information stored in the agent's memory
-                                with st.expander("History/Memory"):
-                                    st.session_state.memory
+                                    with st.expander("History/Memory"):
+                                        st.session_state.memory
 
 if __name__ == "__main__":
     main()
