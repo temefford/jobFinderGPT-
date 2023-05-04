@@ -202,7 +202,7 @@ def main():
                                 )
                             agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True, return_intermediate_steps=True)
                             agent_chain = AgentExecutor.from_agent_and_tools(
-                                agent=agent, tools=tools, verbose=True, memory=st.session_state.memory
+                                agent=agent, tools=tools, verbose=True, memory=memory
                                 )
                             container = st.container()
                             with container:
