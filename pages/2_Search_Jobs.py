@@ -74,8 +74,8 @@ def main():
                 with st.spinner("uploading..."):
                     url = "https://linkedin-jobs-search.p.rapidapi.com/"
                     payload = {
-                        "search_terms": "{role_input}",
-                        "location": "{loc_input}",
+                        "search_terms": "Data Science",
+                        "location": "San Francisco, CA",
                         "page": "1"
                     }
                     headers = {
