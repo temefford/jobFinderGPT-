@@ -26,7 +26,7 @@ if "ai_goals" not in st.session_state:
     st.session_state.ai_goals = False
       
 cfg = Config()
-openai_api = "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"
+openai_api = cfg.openai_api_key
 google_api = cfg.google_api_key
 st.title("Your Personal Employment Agency")
 st.subheader("Set up and manage your team of AI bots to help you find a job. The 'job agents' that are recursively trained as you interact with them and are attached to LLM's and the internet to do the tedious work for you.")
