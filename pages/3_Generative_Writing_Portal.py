@@ -49,8 +49,8 @@ if google_api:
                 
 cfg=config.Config()
 # Set org ID and API key
-#openai.organization = "org-DVSnWLza0jZx39jd8LySmnUY"
-#openai.api_key = cfg.openai_api_key
+openai.organization = "org-DVSnWLza0jZx39jd8LySmnUY"
+openai.api_key = cfg.openai_api_key
 
 # Initialise session state variables
 if 'generated' not in st.session_state:

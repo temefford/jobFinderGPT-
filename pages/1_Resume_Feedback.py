@@ -78,6 +78,14 @@ def parse_pdf(file: BytesIO) -> List[str]:
     return output
 
 def main():
+    if 'generated_res' not in st.session_state:
+        st.session_state['generated_res'] = []
+    if 'past_res' not in st.session_state:
+        st.session_state['past_res'] = []  
+    if "user_input" not in st.session_state:
+        st.session_state['user_input'] = ""
+    if "output" not in st.session_state:
+        st.session_state['output'] = ""
     @st.cache_data
     def text_to_docs(text: str) -> List[Document]:
         """Converts a string or list of strings to a list of Documents
@@ -111,7 +119,7 @@ def main():
     # Define a function for the embeddings
     @st.cache_data
     def test_embed():
-        embeddings = OpenAIEmbeddings(openai_api_key=openai_api)
+        embeddings = OpenAIEmbeddings(openai_api_key="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")
         # Indexing
         # Save in a Vector DB
         with st.spinner("It's indexing..."):
@@ -140,98 +148,98 @@ def main():
                 #     label="Select Page", min_value=1, max_value=len(pages), step=1
                 # )    
                 # pages[page_sel - 1]  
-            if st.session_state.open_api == None:
-                openai_api = st.text_input(
-                        "**Enter OpenAI API Key**",
-                        type="password",
-                        placeholder="sk- ",
-                        help="https://platform.openai.com/account/api-keys",
-                    )
-                if openai_api:
-                    cfg.set_openai_api_key(openai_api)
-                    st.write("**OpenAPI stored**")
-                    st.session_state.open_api = openai_api
-                    # Test the embeddings and save the index in a vector database
-                    index = test_embed()
-                    # Set up the question-answering system
-                    qa = RetrievalQA.from_chain_type(
-                        llm=OpenAI(openai_api_key=openai_api),
-                        chain_type = "stuff",
-                        retriever=index.as_retriever()
-                    )
-                    with st.spinner(
-                            "Analyzing your resume: `{}` ".format("Analyzing")
-                        ):
-                        out = qa.run("What is this document about? What are the key points? Why is it so amazing?")
-                        if out:
-                            message(out)
-                            llm = OpenAI(
-                                    temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
-                                )
-                            memory = ConversationBufferMemory(memory_key="chat_history")
-                            tools = [    
-                                Tool(
-                                    name="Document Query",
-                                    func=qa.run,
-                                    description="Useful when answering questions about document or answering questions related to the Curriculum Vitae.",
-                                )
-                            ]
-                            prefix = """Welcome to the Document QA retrieval feedback chatbot. A work history document will be submitted for review and questions. 
-                                    You have access to a single tool:"""
-                            suffix = """Begin!"
-                            {chat_history}
-                            Question: {input}
-                            {agent_scratchpad}"""
+                # if st.session_state.open_api == None:
+                # openai_api = st.text_input(
+                #         "**Enter OpenAI API Key**",
+                #        type="password",
+                #        placeholder="sk- ",
+                 #       help="https://platform.openai.com/account/api-keys",
+                #    ) 
+                #if openai_api:"""
+                # cfg.set_openai_api_key(openai_api)
+                # st.write("**OpenAPI stored**")
+                # st.session_state.open_api = openai_api
+                # Test the embeddings and save the index in a vector database
+            index = test_embed()
+            # Set up the question-answering system
+            qa = RetrievalQA.from_chain_type(
+                llm=OpenAI(openai_api_key=openai_api),
+                chain_type = "stuff",
+                retriever=index.as_retriever()
+            )
+            with st.spinner(
+                    "Analyzing your resume: `{}` ".format("Analyzing")
+                ):
+                out = qa.run("What is this document about? What are the key points? Why is it so amazing?")
+                if out:
+                    message(out)
+                    llm = OpenAI(
+                            temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
+                        )
+                    memory = ConversationBufferMemory(memory_key="chat_history")
+                    tools = [    
+                        Tool(
+                            name="Document Query",
+                            func=qa.run,
+                            description="Useful when answering questions about document or answering questions related to the Curriculum Vitae.",
+                        )
+                    ]
+                    prefix = """Welcome to the Document QA retrieval feedback chatbot. A work history document will be submitted for review and questions. 
+                            You have access to a single tool:"""
+                    suffix = """Begin!"
+                    {chat_history}
+                    Question: {input}
+                    {agent_scratchpad}"""
 
-                            prompt = ZeroShotAgent.create_prompt(
-                                tools,
-                                prefix=prefix,
-                                suffix=suffix,
-                                input_variables=["input", "chat_history", "agent_scratchpad"],
-                                )
-                            if "memory" not in st.session_state:
-                                st.session_state.memory = ConversationBufferMemory(
-                                    memory_key="chat_history", return_messages=True
-                                )
+                    prompt = ZeroShotAgent.create_prompt(
+                        tools,
+                        prefix=prefix,
+                        suffix=suffix,
+                        input_variables=["input", "chat_history", "agent_scratchpad"],
+                        )
+                    if "memory" not in st.session_state:
+                        st.session_state.memory = ConversationBufferMemory(
+                            memory_key="chat_history", return_messages=True
+                        )
 
-                            llm_chain = LLMChain(
-                                llm=OpenAI(
-                                    temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
-                                ),
-                                prompt=prompt,
+                    llm_chain = LLMChain(
+                        llm=OpenAI(
+                            temperature=0.7, openai_api_key=openai_api, model_name="gpt-3.5-turbo"
+                        ),
+                        prompt=prompt,
+                        )
+                    agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True, return_intermediate_steps=True)
+                    agent_chain = AgentExecutor.from_agent_and_tools(
+                        agent=agent, tools=tools, verbose=True, memory=st.session_state.memory
+                        )
+                    container = st.container()
+                    with container:
+                        with st.form(key='my_form', clear_on_submit=True):
+                            resume_query = st.text_input(
+                                "**Insert Text Here**",
+                                placeholder="You can ask me more questions about your work history here",
                                 )
-                            agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True, return_intermediate_steps=True)
-                            agent_chain = AgentExecutor.from_agent_and_tools(
-                                agent=agent, tools=tools, verbose=True, memory=st.session_state.memory
-                                )
-                            container = st.container()
-                            with container:
-                                with st.form(key='my_form', clear_on_submit=True):
-                                    resume_query = st.text_input(
-                                        "**Insert Text Here**",
-                                        placeholder="You can ask me more questions about your work history here",
-                                        )
-                                    submit_button = st.form_submit_button(label='Send')
-                                if submit_button and resume_query:
-                                    st.session_state['user_input'] = resume_query
-                                    with st.spinner(
-                                        "Generating Answer to your Query : `{}` ".format(resume_query)
-                                        ):
-                                        res = agent_chain.run(resume_query)
-                                        st.session_state.generated_res.append(res)
-                                        st.info(res, icon="🤖")
-                                    st.session_state['past'].append(resume_query)
-                                    # Allow the user to view the conversation history and other information stored in the agent's memory
-                                    if st.session_state['generated_res']:
-                                        st.write("Chat History")
-                                        for i in range(len(st.session_state['generated_res'])-1, 0, -1):
-                                            message(st.session_state["generated_res"][i], key=str(i))
-                                            message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
-                                                    
+                            submit_button = st.form_submit_button(label='Send')
+                        if submit_button and resume_query:
+                            st.session_state['user_input'] = resume_query
+                            with st.spinner(
+                                "Generating Answer to your Query : `{}` ".format(resume_query)
+                                ):
+                                res = agent_chain.run(resume_query)
+                                st.session_state.generated_res.append(res)
+                                st.info(res, icon="🤖")
+                            st.session_state['past_res'].append(resume_query)
+                            # Allow the user to view the conversation history and other information stored in the agent's memory
+                            if st.session_state['generated_res']:
+                                st.write("Chat History")
+                                for i in range(len(st.session_state['generated_res'])-1, 0, -1):
+                                    message(st.session_state["generated_res"][i], key=str(i))
+                                    message(st.session_state['past_res'][i], is_user=True, key=str(i) + '_user')
+                                            
 
-                                # Allow the user to view the conversation history and other information stored in the agent's memory
-                                with st.expander("History/Memory"):
-                                    st.session_state.memory
+                        # Allow the user to view the conversation history and other information stored in the agent's memory
+                        with st.expander("History/Memory"):
+                            st.session_state.memory
 
 if __name__ == "__main__":
     main()
